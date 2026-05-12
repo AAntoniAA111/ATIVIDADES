@@ -6,10 +6,14 @@ import java.time.format.*;
 // LINHA 125 A 231 ESTÁ COM ERRO QUE EU AINDA NÃO CONSEGUI RESOLVER
 public class Main{
 
+    //VALORES CONSTANTES == SISTEMA + LEGÍVEL
+    //FINAL == VALOR NÃO PODE SER MUDADO
+    //STATIC == VALOR PERTENCE À CLASSE
     static final int VISITANTE = 1;
     static final int FUNCIONARIO = 2;
     static final int ADMINISTRADOR = 3;
 
+    //LISTA DE USUÁRIOS QUE >> JÁ FORAM << CADASTRADOS
     static List<String[]> usuarios = new ArrayList<>(Arrays.asList(
             new String[]{"AliceBG", "adm786268", String.valueOf(ADMINISTRADOR)},
             new String[]{"FláviaAV", "vend012943", String.valueOf(FUNCIONARIO)},
@@ -17,37 +21,56 @@ public class Main{
             new String[]{"Margarida01", "05091963", String.valueOf(VISITANTE)}
     ));
 
+
+    //LISTA PARA REGISTAR O HISTÓRICO DE ENTRADAS
     static List<String> historico = new ArrayList<>();
 
-    static void registrarAcesso(String usuario, String area, boolean autorizado){
+
+    //RESPONSÁVEL POR REGISTRAR AS TENTATIVAS DE ACESSO
+    static void registrarAcesso(String usuario, //QUEM
+                                String area, //ONDE
+                                boolean autorizado){
+        //CAPTURA DA HARA E HORA EM QUE O ACESSO ACONTECEU
         String dataHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-        String resultado = autorizado ? "AUORIZADO" : "NEGADO";
+        //DEFINE RESULTADO USNADO OPERADOR TERNÁRIO (IF/ELSE EM UMA LINHA)
+        //UTILIZAR EM CASOS SIMPLES ONDE A DECISÃO RESULTA EM UM VALOR DIRETO
+        String resultado = autorizado ? "AUTORIZADO" : "NEGADO";
+        //MONTA E SALVA O REGISTRO
         historico.add("[" + dataHora + "] Usuário: " + usuario + "  |  Área: " + area +  "| " + resultado);
     }
 
+    //VERIFICA SE O USUÁRIO TEM NÍVEL PERMITIDO PARA ACESSAR A ÁREA DESEJADA
     static boolean temPermissao(String usuario, int nivelUsuario, String area, int nivelMinimo){
         boolean autorizado = nivelUsuario >= nivelMinimo;
         registrarAcesso(usuario, area, autorizado);
+        //CASO A AUTORIZAÇÃO SEJA NEGADA
         if(!autorizado){
             IO.print("\n ACESSO NEGADO! VOCÊ NÃO TEM PERMISSAO PARA ACESSAR: " + area + "\n");
         }
         return autorizado;
     }
 
+
     static String[] buscarUsuario(String nome){
+        //PECORRE CADA ELEMENTO DA LISTA >>USUARIOS<< UM POR UM
         for(String[] u : usuarios)
+            //VERIFICAÇÃO
             if (u[0].equals(nome)) return u;
         return null;
     }
 
+
+    //NÍVEIS DE CADA USUÁRIO
     static String nomePerfil(int nivel){
-        if(nivel == ADMINISTRADOR) return "Adminis trador";
+        if(nivel == ADMINISTRADOR) return "Administrador";
         if(nivel == FUNCIONARIO) return "Funcionário";
         return "Visitante";
     }
 
+
     static void login() throws IOException{
         Scanner scanner = new Scanner(System.in);
+
 
         IO.print("\n╔════════════════════════════════════════════╗\n");
         IO.print("║     TELA DE LOGIN - Farmácia Viscondi      ║\n");
@@ -58,6 +81,7 @@ public class Main{
         IO.print("\n➤ESCOLHA UMA OPÇÃO: ");
         int opcao = scanner.nextInt();
         scanner.nextLine();
+
 
         while(opcao < 1 || opcao > 2){
             IO.print("\nOPÇÃO INVÁLIDA\n\n");
@@ -77,12 +101,12 @@ public class Main{
                 user = scanner.nextLine();
             }
 
+
             IO.print("\nDIGITE A SENHA\n➤");
             String senha = scanner.nextLine();
-
             String[] dadosUser = buscarUsuario(user);
             boolean senhaCorreta = dadosUser[1].equals(senha);
-
+            
             int tentativas = 3;
             while (!senhaCorreta && tentativas > 0) {
                 tentativas--;
@@ -99,12 +123,12 @@ public class Main{
                 senhaCorreta = dadosUser[1].equals(senha);
             }
 
+
             registrarAcesso(user, "LOGIN", true);
             int nivel = Integer.parseInt(dadosUser[2]);
-
             IO.print("\nLOGIN REALIZADO COM SUCESSO!\n");
             IO.print("BEM-VINDO(A) DE VOLTA, " + user + "! [" + nomePerfil(nivel) + "]\n");
-
+            
             if(nivel == ADMINISTRADOR){
                 menuAdministrador(scanner, user, nivel);
             } else if (nivel == FUNCIONARIO) {
@@ -120,6 +144,7 @@ public class Main{
             IO.print("╚════════════════════════════════════════════╝\n\n");
         }
     }
+
 
     //MENU ADMINISTRATIVO
     static void menuAdministrador(Scanner scanner, String user, int nivel){
@@ -138,6 +163,7 @@ public class Main{
             IO.print("[0] SAIR\n");
             IO.print("\n➤ESCOLHA UMA OPÇÃO: ");
             op = scanner.nextInt(); scanner.nextLine();
+
 
             switch (op) {
                 case 1:
@@ -164,6 +190,7 @@ public class Main{
         } while(op != 0);
     }
 
+
     //MENU FUNCIONÁRIO
     static void menuFuncionario(Scanner scanner, String user, int nivel) {
         int op;
@@ -179,6 +206,7 @@ public class Main{
             IO.print("[0] SAIR\n");
             IO.print("\n➤ESCOLHA UMA OPÇÃO: ");
             op = scanner.nextInt(); scanner.nextLine();
+
 
             switch (op) {
                 case 1:
@@ -199,6 +227,7 @@ public class Main{
         } while (op != 0);
     }
 
+
     //MENU CLIENTE
     static void menuCliente(Scanner scanner, String user, int nivel) {
         int op;
@@ -213,6 +242,7 @@ public class Main{
             IO.print("[0] SAIR\n");
             IO.print("\n➤ESCOLHA UMA OPÇÃO: ");
             op = scanner.nextInt(); scanner.nextLine();
+
 
             switch (op) {
                 case 1:
@@ -230,6 +260,7 @@ public class Main{
         } while (op != 0);
     }
 
+
     static void gerenciarUsuarios(Scanner scanner, String adminAtual) {
         int op;
         do {
@@ -244,6 +275,7 @@ public class Main{
             IO.print("\n➤ESCOLHA UMA OPÇÃO: ");
             op = scanner.nextInt(); scanner.nextLine();
 
+
             switch (op) {
                 case 1: listarUsuarios();                    break;
                 case 2: cadastrarUsuario(scanner);           break;
@@ -255,6 +287,7 @@ public class Main{
         } while (op != 0);
     }
 
+
     static void listarUsuarios() {
         IO.print("\n── USUÁRIOS CADASTRADOS ──────────────────────\n");
         for (int i = 0; i < usuarios.size(); i++) {
@@ -263,26 +296,32 @@ public class Main{
         }
     }
 
+
     static void cadastrarUsuario(Scanner scanner) {
         IO.print("\n── CADASTRAR USUÁRIO ─────────────────────────\n");
         IO.print("Nome: ");
         String nome = scanner.nextLine();
+
 
         if (buscarUsuario(nome) != null) {
             IO.print("⚠️ Usuário já existe!\n");
             return;
         }
 
+
         IO.print("Senha: ");
         String senha = scanner.nextLine();
+
 
         IO.print("Perfil: [1] VISITANTE  [2] FUNCIONÁRIO  [3] ADMINISTRADOR\n➤");
         int nv = scanner.nextInt(); scanner.nextLine();
         int nivel = (nv == 3) ? ADMINISTRADOR : (nv == 2) ? FUNCIONARIO : VISITANTE;
 
+
         usuarios.add(new String[]{nome, senha, String.valueOf(nivel)});
         IO.print("✅ Usuário " + nome + " cadastrado com sucesso!\n");
     }
+
 
     static void editarUsuario(Scanner scanner) {
         listarUsuarios();
@@ -290,16 +329,20 @@ public class Main{
         int idx = scanner.nextInt() - 1; scanner.nextLine();
         if (idx < 0 || idx >= usuarios.size()) { IO.print("Cancelado.\n"); return; }
 
+
         String[] u = usuarios.get(idx);
         IO.print("Editando: " + u[0] + "\n");
+
 
         IO.print("Novo nome (Enter para manter): ");
         String novoNome = scanner.nextLine();
         if (!novoNome.isBlank()) u[0] = novoNome;
 
+
         IO.print("Nova senha (Enter para manter): ");
         String novaSenha = scanner.nextLine();
         if (!novaSenha.isBlank()) u[1] = novaSenha;
+
 
         IO.print("Novo perfil [1]VISITANTE [2]FUNCIONÁRIO [3]ADMINISTRADOR (Enter p/ manter): ");
         String nv = scanner.nextLine();
@@ -307,14 +350,17 @@ public class Main{
         if (nv.equals("2")) u[2] = String.valueOf(FUNCIONARIO);
         if (nv.equals("3")) u[2] = String.valueOf(ADMINISTRADOR);
 
+
         IO.print("✅ Usuário atualizado com sucesso!\n");
     }
+
 
     static void removerUsuario(Scanner scanner, String adminAtual) {
         listarUsuarios();
         IO.print("\nNúmero do usuário a remover (0 = cancelar): ");
         int idx = scanner.nextInt() - 1; scanner.nextLine();
         if (idx < 0 || idx >= usuarios.size()) { IO.print("Cancelado.\n"); return; }
+
 
         String[] alvo = usuarios.get(idx);
         if (alvo[0].equals(adminAtual)) {
@@ -325,9 +371,11 @@ public class Main{
         usuarios.remove(idx);
     }
 
+
     // ══════════════════════════════════════════════
     //  HISTÓRICO  (somente Administrador)
     // ══════════════════════════════════════════════
+
 
     static void exibirHistorico() {
         IO.print("\n╔════════════════════════════════════════════╗\n");
@@ -341,7 +389,12 @@ public class Main{
     }
 
 
+
+
     public static void main(String[] args) throws IOException {
         login();
     }
 }
+
+
+
